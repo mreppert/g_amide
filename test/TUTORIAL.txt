@@ -1,0 +1,126 @@
+A sample MD simulation is included in the test/md directory in the file
+traj.xtc. The corresponding topology files are named topol.top (text) and
+topol.tpr (binary run file). 
+
+(1) In a terminal window, change to the directory g_amide/test/md. For
+example, if the program is installed in the directory /home/mike/g_amide,
+enter
+
+	cd /home/mike/g_amide/test
+
+
+
+(2) Choose a map. Currently five options are included in this distribution
+in the folder g_amide/maps. Descriptions of each map are provided there. 
+For our example, we'll use DC15.txt. When running the program, the map 
+file is specified using the -mapfile flag. 
+
+
+(3) Run the program! A test trajectory for the AAA tripeptide (two amide
+oscillators) in the directory g_amide/test/md. For example, to use the DC map,
+enter from the test directory, enter at the command line 
+
+	g_amide -mapfile ../maps/DC15.txt -f input/traj.xtc -s input/topol.tpr -outname output/
+
+The -f and -s flags are standard gromacs input flags and identify the
+structure file (*.xtc, *.trr, or *.gro) and (binary) topology file (*.tpr)
+from which the program will read information such as atomic identities and
+charges and simulation time step. Both files are necessary to run g_amide! 
+By default g_amide looks for files named traj.xtc/traj.trr/traj.pdb for the
+coordinate file and topol.tpr for the topology file. If files with those names 
+are located in the current directory, the program will use them as input
+without any user input (the -f and -s flags are then not necessary). 
+
+The -outname flag specifies an output directory (if the name ends in a "/"
+character) or a pre-fix to be appended to the start of all output file names
+(if no trailing "/" character is specified). The previous syntax results in
+output files with default file names (discussed below) saved in the directory
+./output/. To see how custom prefixes work, enter at the command line 
+
+	g_amide -mapfile ../maps/DC15.txt -f input/traj.xtc -s input/topol.tpr -outname output/AAA
+
+Now, output files will still be written to the output directory, but will 
+have the prefix AAA appended to their file names. If no -outname flag is
+specified, output will be written to the current directory. 
+
+
+(4) Look at the output. The directory g_amide/test/output should now contain
+12 files, 6 for each time the program was executed. 
+
+	AAA_dipx.txt	1.1M 
+	AAA_dipy.txt	1.1M
+	AAA_dipz.txt	1.1M
+	AAA_ham.txt	2.3M
+	AAA_info.txt	  33
+	AAA_sites.txt	1.2M 
+	dipx.txt	1.1M 
+	dipy.txt	1.1M 
+	dipz.txt	1.1M 
+	ham.txt		2.3M 
+	info.txt	  33 
+	sites.txt	1.2M 
+
+The first six filenames all begin with the characters AAA_ and are the result 
+of running g_amide with the -outname flag set to output/AAA. The remaining six 
+files have default file names, with no prefix. 
+
+The smallest file in the output is info.txt. This file simply identifies what
+amide bonds the program recognized in parsing the structure file. It provides
+a safety check for the user to confirm that the protein structure has been
+parsed correctly. In our case, the file reads simply
+
+	BONDS: 2
+	ALA 1 ALA 2
+	ALA 2 ALA 3
+
+indicating that two amide bonds have been identified between residues ALA1
+and ALA2 and between residues ALA2 and ALA3. 
+
+Three file names have the format dip*.txt. These contain the x-, y-, and
+z-components of the transition dipole moment for each amide bond. In our case,
+the first five lines of the file dipx.txt read
+
+ -0.209640	0.002588
+ -0.207295	0.011669
+ -0.208113	0.033817
+ -0.206251	0.045580
+ -0.201992	0.031680
+
+The first column specifies the x-component of the transition dipole for the
+first amide bond identified in info.tx while the second column specifies the
+same data for the second bond. By default, coordinate data are reported for 
+each frame in the trajectory file, although down-sampled data can be obtained
+by specifying a time step (in ps) using the -dt flag at the command line. 
+
+The file sites.txt contains site energy data for each amide bond. These
+numbers usually fall in the range 1600 - 1700 (units of cm-1), although the
+values often fluctuate quite widely over the course of a simulation. The first
+line of our sites.txt file reads
+
+1634.231201     1675.055908
+
+This site energy data is also included in the final file ham.txt, which also
+specifies coupling constants between sites, giving the complete, one-quantum,
+Amide I Hamiltonian for the system. Each line of the ham.txt file specifies a
+complete Hamiltonian for one MD frame; for an n-site system, each line has n*n
+entries which (when re-shaped by stacking successive n-element chunks of the
+line on top of one another) produces a single nxn Hermitian matrix. For
+example, the first line of our ham.txt file contains the data 
+
+1634.231201	6.038501	6.038501	1675.055908
+
+The first and last entries are the site energies specified in sites.txt. The
+middle two entries are identical and specify the coupling constant between the
+two bonds. When reshaped by stacking the first two entries on top of the last
+two, we obtain the 2x2 real, symmetric matrix 
+
+1634.231201	6.038501 
+6.038501	1634.231201
+
+
+
+
+
+
+
+
