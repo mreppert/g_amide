@@ -1,7 +1,7 @@
 
 ELECTROSTATIC FREQUENCY SHIFTS
 
-Currently five options are included in this distribution in the folder 
+Currently seven options are included in this distribution in the folder 
 g_amide/maps. File names and references (for the frequency shift map) 
 are as follows:
 

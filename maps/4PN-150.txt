@@ -1,12 +1,26 @@
-FREQ: 1709.1
+# Primary reference:
+#   Reppert and Tokmakoff, J. Chem. Phys. 143, 061102 (2015)
+# Secondary references (Transition dipole and coupling models):
+#    Jansen and Knoester J. Chem. Phys. 124, 044502 (2006)
+#    Jansen et al. J Chem Phys 125, 044312 (2006)
+# See README.txt file for further details. 
 
-PROSHIFT: -31.5
 
-SITES: 1
+FREQ: 1746.4
+
+PROSHIFT: -44.4
+
+SITES: 4
+C
 O
+N
+H
 
 SHIFT: 
-0.0, 2629.9, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0
+1121.7, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0
+-1571.7, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0
+-150.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0
+600.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0
 
 EXCLUDE: 12
 C
@@ -20,7 +34,7 @@ N-CD-HD1
 N-CD-HD2
 N-CD-CG
 N-CD-CG-HG1
-N-CD-CH-HG2
+N-CD-CG-HG2
 
 DIP: 0.242141 -0.085961 0.0
 

@@ -1,25 +1,40 @@
-# Primary Reference: Reppert & Tokmakoff, J Chem Phys 138, 134116 (2013)
-# Secondary Reference: 
-#   Coupling & Dipole Models: Jansen et al. J Chem Phys 125, 044312 (2006)
+# Primary reference:
+#   Reppert and Tokmakoff, J. Chem. Phys. 143, 061102 (2015)
+# Secondary references (Transition dipole and coupling models):
+#    Jansen and Knoester J. Chem. Phys. 124, 044502 (2006)
+#    Jansen et al. J Chem Phys 125, 044312 (2006)
+# See README.txt file for further details.
 
 
-FREQ: 1710.3
+FREQ: 1716.6
 
-PROSHIFT: -35.0
+PROSHIFT: -37.6
 
-SITES: 1
+SITES: 4
+C
 O
+N
+H
 
 SHIFT: 
-0.0, 2707.8, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0
+1076.8, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0
+-1259.8, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0
+-4.2, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0
+187.2, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0
 
-EXCLUDE: 6
+EXCLUDE: 12
 C
 O
 N
 H
 N-CA
 C-CA
+N-CD
+N-CD-HD1
+N-CD-HD2
+N-CD-CG
+N-CD-CG-HG1
+N-CD-CG-HG2
 
 DIP: 0.242141 -0.085961 0.0
 
