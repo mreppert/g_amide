@@ -1,9 +1,15 @@
-
-ELECTROSTATIC FREQUENCY SHIFTS
+The map file specifies a method used to calculate vibrational
+frequencies and coupling constants. The basic ingrediates are an 
+electrostatic map for predicting the effects of local electrostatic
+variables on Amide I vibrational frequencies, an electrostatic coupling
+model that defines through-space interactions between peptide groups
+and a dihedral-based nearest-neighbor map that provides specific 
+coupling and/or frequency shift interactions for nearest-neighbor (i.e.
+bonded) amide groups. 
 
 Currently seven options are included in this distribution in the folder 
-g_amide/maps. File names and references (for the frequency shift map) 
-are as follows:
+g_amide/maps. File names and references (listed by electrostatic
+frequency-shift map) are as follows:
 
 	File Name	Reference	Recommended force field charges
 	DC.txt		[1]		CHARMM27
@@ -65,13 +71,5 @@ All maps use the nearest-neighbor coupling map of [J. Chem. Phys. 125,
 In addition, the JO and SG maps apply a dihedral-dependent nearest-neighbor 
 frequency shift defined by the nearest-neighbor shift map of [J. Chem. Phys. 
 125, 044312 (2006)]. 
-
-
-
-
-
-
-
-
 
 
