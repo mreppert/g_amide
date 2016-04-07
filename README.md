@@ -1,9 +1,26 @@
 # g_amide
 
-The program g_amide generates Amide I site energies, coupling constants,
-and transition dipole moments for proteins and peptides using a combination of
-electrostatic frequency maps and dihedral-parametrized through-bond
-parameters. 
+OVERVIEW
+
+The program g_amide is a post-processing tool for use with the GROMCAS 
+(www.gromacs.org) molecular dynamics (MD) simulation package. The program 
+allows the user to predict Amide I vibrational frequencies and coupling 
+parameters for individual peptide amide groups as a function of time 
+along an MD trajectory. In conjunction with the sister program g_spec (in 
+preparation for release on github), the program allows the user to predict
+Amide I vibrational spectra for different protein structures, allowing the 
+user to link MD simulation ensembles with experimental spectroscopic data. 
+
+g_amide uses a set of electrostatic- and dihedral-based maps for frequency
+and coupling constant calculations. For an overview of these methods see
+[Reppert and Tokmakoff, J Chem Phys. 142, 125104 (2015)]. In works that 
+make use of the g_amide source code, we ask that you cite both the relevant
+spectroscopic map (see README.txt file in the maps subdirectory) and the 
+following review article: 
+
+"Computational Amide I 2D IR Spectroscopy as a Probe of Protein Structure 
+and Dynamics". Ann. Rev. Phys. Chem. Vol. 67 (2016), in press. 
+DOI: 10.1146/annurev-physchem-040215-112055
 
 The program calls GROMACS libraries for file parsing and so requires a local
 gromacs installation to be accessible (see www.gromacs.org). Compiling the code
@@ -14,8 +31,10 @@ include directory should contain a variety of *.h header files. In a default
 gromacs installation, the home directory is just /usr/local/gromacs and
 contains the lib/ and include/gromacs/ directories. 
 
-To install the program: 
 
+INSTALLATION
+
+To install the program: 
 
 (0) Choose an installation directory.
 
