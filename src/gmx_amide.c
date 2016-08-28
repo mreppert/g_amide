@@ -497,7 +497,7 @@ int get_coordinates(t_pbc pbc, t_topology top, rvec *x, t_amide_map map, t_protb
 	return 1;
 }
 
-int get_electrostatics(t_pbc pbc, t_topology top, rvec *x, t_amide_map map, t_protbond *p_pb, matrix *RotMat, int bonds, rvec **coordData, real ***elecData, int nelec, int nthreads, real cutoff) {
+int get_electrostatics(t_pbc pbc, t_topology top, rvec *x, t_amide_map map, t_protbond *p_pb, matrix *RotMat, int bonds, rvec **coordData, real ***elecData, int nelec, int nthreads, real cutoff, int nchunks, int* START, int* STOP) {
 	int b;
 	int natoms = top.atoms.nr;
 	real const nm2bohr = 18.8973;
@@ -508,10 +508,10 @@ int get_electrostatics(t_pbc pbc, t_topology top, rvec *x, t_amide_map map, t_pr
 	omp_set_num_threads(nthreads);
 	#pragma omp parallel for \
 	shared(natoms, pbc, top, x, map, p_pb, RotMat, bonds, \
-		coordData, elecData, nelec)
+		coordData, elecData, nelec, nchunks, START, STOP)
 	#endif
 	for(b=0; b<bonds; b++) {
-		int i,j,at;
+		int i,j,at, k;	// k for looping chunks
 		real d, invd, invd2, invd3, invd5;
 		real q;
 		real DX, DY, DZ;
@@ -530,6 +530,23 @@ int get_electrostatics(t_pbc pbc, t_topology top, rvec *x, t_amide_map map, t_pr
 		}
 		for(at=0; at<natoms; at++) {
 			int good = 1;
+
+			// cjfeng 08/27/2016
+			if(nchunks) {	// Check if we need to include only part of bath
+				for(k=0; k<nchunks; k++) {
+					if(at<START[k]) {	// less than the starting point
+						good = 0;
+					}
+					else if(at>STOP[k]) {	// more than the ending point
+						good = 0;
+					}
+					else {			// Within one of the region
+						good = 1;
+						break;
+					}
+				}
+			}
+			
 			for(i=0; i<p_pb[b].nexcluded; i++) {
 				if(at==p_pb[b].Excluded[i]) {
 					good = 0;
@@ -1469,6 +1486,10 @@ int main ( int argc, char * argv[] ) {
 	char* promapfile = NULL;
 	char* chargefile = NULL;
 	char* outname = NULL;
+	// cjfeng 08/27/2016
+	// Added chunk command to selectively choose portion of bath
+	// to include in electrostatics.
+	char* chunkstr = "";
 	int nthreads = 1;
 	int print_elec = 0;
 	int print_angles = 0;
@@ -1506,7 +1527,9 @@ int main ( int argc, char * argv[] ) {
 		{"-osc", FALSE, etREAL, {&osc}, 
 		"Oscillator strength (Debye^2). If positive, used to normalize dipole moments."},
 		{"-verbose", FALSE, etBOOL, {&verbose}, 
-		"Verbose (print lots of info)"}
+		"Verbose (print lots of info)"},
+		{"-chunk", FALSE, etSTR, {&chunkstr},
+		 "Chunk range for selecting part of the system to be included for electrostatic frequency shift, format: [a-b;...;c-d]. Indexing begins at zero."}
 		};	
 
 	// The program description
@@ -1520,6 +1543,46 @@ int main ( int argc, char * argv[] ) {
 	CopyRight(stderr, argv[0]);
 	parse_common_args(&argc, argv, PCA_CAN_TIME | PCA_BE_NICE, asize(fnm), fnm, asize(pa), pa, asize(desc), desc, asize(bugs), bugs, &oenv);
 
+	/**********************************************************
+ 	* We first check if only part of the bath is included for *
+ 	* computing electrostatic frequency shift.                *
+ 	* cjfeng 08/27/2016                                       *
+	**********************************************************/
+	int START[1000];	// Starting index for computing electrostatics
+	int STOP[1000];		// Ending index for computing electrostatics
+	int nchunks = 0;	// Number of chunks
+
+	if( strlen(chunkstr)!=0 ) {
+		int i, j;
+		printf("Parsing chunk request %s...\n", chunkstr);
+		if( (chunkstr[0]!='[') || (chunkstr[strlen(chunkstr)-1]!=']') ) {
+			printf("Error parsing chunk string. Format: [a-b;c-d;...;e-f]\n");
+			return 0;
+		} else {
+			// Changed string processing code. MER 10/04/2014
+			char chunk[1000];
+			for(i=0; i<strlen(chunkstr); i++) {
+				if( (chunkstr[i]==';') || (chunkstr[i]=='[') ) {
+					for(j=i+1; j<strlen(chunkstr); j++) {
+						if( (chunkstr[j]==';') || (chunkstr[j]==']') ) {
+							strncpy(chunk, chunkstr+i+1, j-i-1);
+							chunk[j-i-1] = '\0';
+							break;
+						}
+					}
+					int start, stop;
+					if( (j>=strlen(chunkstr)) || (sscanf(chunk, "%d-%d", &start, &stop)!=2) ) {
+						printf("Error parsing input segment %s\n", chunk);
+						return 0;
+					} else {
+						START[nchunks] = start;
+						STOP[nchunks] = stop;
+						nchunks++;
+					}
+				}
+			}
+		}
+	}
 
 	/************************************************************************
 	Now we check the input. First we check and set the mapping parameters,
@@ -1840,8 +1903,8 @@ int main ( int argc, char * argv[] ) {
 		get_coordinates(pbc, top, x, map, p_pb, bonds, RotMat, coordData);
 		if(promap.nsites!=0) get_coordinates(pbc, top, x, promap, p_ppb, nPro, ProRotMat, ProCoordData);
 		// Calculate electrostatic values around each bond. 
-		get_electrostatics(pbc, top, x, map, p_pb, RotMat, bonds, coordData, elecData, nelec, nthreads, cutoff);
-		if(promap.nsites!=0) get_electrostatics(pbc, top, x, promap, p_ppb, ProRotMat, nPro, ProCoordData, ProElecData, nelec, nthreads, cutoff);
+		get_electrostatics(pbc, top, x, map, p_pb, RotMat, bonds, coordData, elecData, nelec, nthreads, cutoff, nchunks, START, STOP);
+		if(promap.nsites!=0) get_electrostatics(pbc, top, x, promap, p_ppb, ProRotMat, nPro, ProCoordData, ProElecData, nelec, nthreads, cutoff, nchunks, START, STOP);
 		// Calculate dihedral angles for each bond. 
 		get_angles(&pbc, top, x, map, p_pb, bonds, angleData, nangles);
 		if(promap.nsites!=0) get_angles(&pbc, top, x, promap, p_ppb, nPro, ProAngleData, nangles);
