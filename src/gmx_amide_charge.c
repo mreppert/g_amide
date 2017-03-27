@@ -463,8 +463,10 @@ int swap_atomnames(t_topology top, char **repnames[2], int nrep, int verbose) {
 		for(i=0; i<nrep; i++) {
 			if(strcmp(repnames[0][i], *(top.atoms.atomname[at]))==0) {
 				if(verbose) printf("Matched atom %d (%s) to replacement name %s\n", at, *(top.atoms.atomname[at]), repnames[1][i]);
-				strncpy(*(top.atoms.atomname[at]), repnames[1][i], 5);
-				*(*(top.atoms.atomname[at])+5) = '\0';
+				// cjfeng 03/27/2017
+				*(top.atoms.atomname[at]) = strdup(repnames[1][i]);
+				// strncpy(*(top.atoms.atomname[at]), repnames[1][i], 5);
+				// *(*(top.atoms.atomname[at])+5) = '\0';
 				break;
 			}
 		}
