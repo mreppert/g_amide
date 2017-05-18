@@ -383,11 +383,13 @@ int read_amide_map( char* fnm, t_amide_map *p_map, int verbose ) {
 	map.freq = 0.0;
 	map.proshift = 0.0;
 	map.dimNNFSN[0] = 0;
-	map.dimNNFSC[0] = 0;
-	map.dimNNC[0] = 0;
 	map.dimNNFSN[1] = 0;
+	map.dimNNFSC[0] = 0;
 	map.dimNNFSC[1] = 0;
+	map.dimNNC[0] = 0;
 	map.dimNNC[1] = 0;
+	map.dimDNNC[0] = 0;
+	map.dimDNNC[1] = 0;
 	map.dipset = 0;
 	map.tcset = 0;
 	int i,j,k;
